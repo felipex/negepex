@@ -1,0 +1,32 @@
+FROM python:3.9.7-alpine
+
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE 1
+
+# Install python and pip
+RUN apk add bash
+RUN apk add build-base postgresql-dev libpq --no-cache --virtual .build-deps 
+RUN pip3 install --upgrade pip
+
+#RUN apk add --no-cache --update python3 py3-pip bash
+ADD ./app/requirements.txt /tmp/requirements.txt
+
+# Install dependencies
+RUN pip3 install --no-cache-dir -q -r /tmp/requirements.txt
+
+# Expose is NOT supported by Heroku
+EXPOSE 8000 		
+
+# Run the image as a non-root user
+RUN adduser -D appuser 
+USER appuser
+RUN mkdir /home/appuser/webapp
+WORKDIR /home/appuser/webapp
+
+
+
+# Run the app.  CMD is required to run on Heroku
+# $PORT is set by Heroku			
+#CMD gunicorn --bind 0.0.0.0:$PORT --reload wsgi:app
+CMD negepe/manage.py runserver 0.0.0.0:$PORT
+
