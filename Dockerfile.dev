@@ -21,12 +21,12 @@ EXPOSE 8000
 RUN adduser -D appuser 
 USER appuser
 RUN mkdir /home/appuser/webapp
-WORKDIR /home/appuser/webapp
+WORKDIR /home/appuser/webapp/negepe 
 
 
 
 # Run the app.  CMD is required to run on Heroku
 # $PORT is set by Heroku			
-#CMD gunicorn --bind 0.0.0.0:$PORT --reload wsgi:app
-CMD negepe/manage.py runserver 0.0.0.0:$PORT
+CMD gunicorn --bind 0.0.0.0:$PORT --reload negepe.wsgi
+#CMD ./manage.py runserver 0.0.0.0:$PORT
 

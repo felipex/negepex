@@ -15,6 +15,7 @@ nginx_:
 	docker run -d --rm -p 80:80 \
 		--expose 80 \
 		--mount type=bind,source=$(PWD)/app,target=/home/appuser/webapp \
+		--mount type=bind,source=$(PWD)/nginx/conf.d,target=/etc/nginx/conf.d \
 		--network $(NETWORK) \
 		--name nginx \
 		nginx
@@ -44,7 +45,8 @@ run_:
 		--network $(NETWORK) \
 		--name $(APP) \
 		$(APP) \
-	    django-admin startproject negepe	
+		bash
+	    #django-admin startproject negepe	
 
 run:
 	docker run --rm -p $(PORT):$(PORT) \
