@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.html import format_html
 
 from .models import Unidade, Cargo, Lotacao, Funcao, Servidor
 
@@ -23,12 +24,22 @@ class CargoAdmin(admin.ModelAdmin):
 
 @admin.register(Servidor)
 class ServidorAdmin(admin.ModelAdmin):
-    list_display = ("siape", "nome", "cpf_display", "cargo", "lotacao")
+    list_display = ("acoes", "siape", "nome", "cpf_display", "cargo", "lotacao", "funcao")
     search_fields = ("siape", "nome", "cpf", "cargo__nome", "lotacao__unidade__nome", "lotacao__unidade__sigla")
     list_display_links = ("siape", "nome", "cpf_display")
     list_per_page = 20
 
-    list_filter = ("local", "cargo__grupo")
+    list_filter = ("local", "cargo__grupo", "cargo__nivel")
+
+    def acoes(self, obj):
+        view_name = "admin:{}_{}_change".format(obj._meta.app_label, obj._meta.model_name)
+        link = f"https://www.portaltransparencia.gov.br/servidores/consulta?paginacaoSimples=true&tamanhoPagina=&offset=&direcaoOrdenacao=asc&cpf={obj.cpf}&colunasSelecionadas=detalhar%2Ctipo%2Ccpf%2Cnome%2CorgaoServidorLotacao%2Cmatricula%2Csituacao%2Cfuncao%2Ccargo%2Cquantidade&t=M6rlYZUZSXukAsrGPAF0"
+
+        #html1 = f'<a target="_blank" href="/admin/core/lotacao/?servidor__id__exact={obj.id}"><svg xmlns="http://www.w3.org/2000/svg"  id="Layer_1" data-name="Layer 1" viewBox="0 0 24 24" width="20" height="20"><path d="M20,12a3.994,3.994,0,0,0-3.172,1.566l-.07-.03a5,5,0,0,0-6.009-6.377l-.091-.172A3.995,3.995,0,1,0,8.879,7.9l.073.137a4.992,4.992,0,0,0-1.134,6.7L5.933,16.5a4,4,0,1,0,1.455,1.377l1.838-1.718a4.993,4.993,0,0,0,6.539-.871l.279.119A4,4,0,1,0,20,12ZM6,4A2,2,0,1,1,8,6,2,2,0,0,1,6,4ZM4,22a2,2,0,1,1,2-2A2,2,0,0,1,4,22Zm8-7a3,3,0,0,1-1.6-5.534l.407-.217A3,3,0,1,1,12,15Zm8,3a2,2,0,1,1,2-2A2,2,0,0,1,20,18Z"/></svg></a>'
+        html1 = f'<a target="_blank" href="{link}"><svg xmlns="http://www.w3.org/2000/svg"  id="Layer_1" data-name="Layer 1" viewBox="0 0 24 24" width="20" height="20"><path d="M20,12a3.994,3.994,0,0,0-3.172,1.566l-.07-.03a5,5,0,0,0-6.009-6.377l-.091-.172A3.995,3.995,0,1,0,8.879,7.9l.073.137a4.992,4.992,0,0,0-1.134,6.7L5.933,16.5a4,4,0,1,0,1.455,1.377l1.838-1.718a4.993,4.993,0,0,0,6.539-.871l.279.119A4,4,0,1,0,20,12ZM6,4A2,2,0,1,1,8,6,2,2,0,0,1,6,4ZM4,22a2,2,0,1,1,2-2A2,2,0,0,1,4,22Zm8-7a3,3,0,0,1-1.6-5.534l.407-.217A3,3,0,1,1,12,15Zm8,3a2,2,0,1,1,2-2A2,2,0,0,1,20,18Z"/></svg></a>'
+        return format_html(html1)
+
+    acoes.short_description = "Ações"
 
 
 @admin.register(Lotacao)

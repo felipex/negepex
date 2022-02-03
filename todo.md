@@ -28,3 +28,6 @@
 [ ] TAEs por nível
 [ ] Buscar dados do portal da transparência (funcional e viagens)
 
+
+
+https://django-tips.avilpage.com

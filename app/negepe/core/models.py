@@ -4,7 +4,7 @@ class Unidade(models.Model):
     nome = models.CharField(max_length=100)
     sigla = models.CharField(max_length=50)
     codigo = models.CharField("código", max_length=60)
-    umae = models.CharField(max_length=60)
+    umae = models.CharField("unidade mãe", max_length=60)
 
     def __str__(self):
         return f"{self.sigla} -  {self.nome}"
@@ -76,10 +76,25 @@ class Servidor(models.Model):
     def lotacao(self):
         return Lotacao.objects.filter(servidor=self).order_by('-dt_entrada').all()[0]
 
+    lotacao.fget.short_description = "lotação"
+
+    @property
+    def funcao(self):
+        f = Funcao.objects.filter(servidor=self).order_by('-dt_entrada').all()
+        if (f):
+            return f[0]
+        else:
+            return None
+    funcao.fget.short_description = "função"
+    
     @property
     def cpf_display(self):
         return self.cpf[0:3]+'.'+self.cpf[3:6]+'.'+self.cpf[6:9]+'-'+ self.cpf[9:11]
+    cpf_display.fget.short_description = "CPF"
  
+    class Meta:
+        verbose_name_plural = "Servidores"
+
 
     def __str__(self):
         return self.nome
@@ -91,6 +106,10 @@ class Lotacao(models.Model):
     dt_entrada = models.DateField("data de entrada")
     dt_saida = models.DateField("data de saída", null=True, blank=True)
     dt_inclusao = models.DateField("inclusão", null=False, blank=False, auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Lotação"
+        verbose_name_plural = "Lotações"
 
     def __str__(self):
         return f"{self.unidade.sigla} - {self.unidade.nome}"
@@ -116,6 +135,13 @@ class Funcao(models.Model):
     dt_entrada = models.DateField("data de entrada")
     dt_saida = models.DateField("data de saída", null=True, blank=True)
     dt_inclusao = models.DateField("inclusão", null=False, blank=False, auto_now_add=True)
+
+    def __str__(self):
+        return self.descricao
+
+    class Meta:
+        verbose_name = "Função"
+        verbose_name_plural = "Funções"
 
 
 """
