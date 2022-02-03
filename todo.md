@@ -13,10 +13,10 @@
 
 ### Geral
 [ ] Publicar
-[ ] Alterar leiaute
-[ ] Rodar com gunicorn
-[ ] Rodar com nginx
-[ ] Fazer o collectstatic
+[X] Alterar leiaute - Já comecei e dá para uma primeira versão.
+[X] Rodar com gunicorn
+[X] Rodar com nginx
+[X] Fazer o collectstatic
 [ ] Login google
 
 
