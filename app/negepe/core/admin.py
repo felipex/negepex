@@ -7,9 +7,9 @@ admin.site.disable_action('delete_selected')
 
 @admin.register(Unidade)
 class UnidadeAdmin(admin.ModelAdmin):
-    list_display = ('sigla', 'nome', 'codigo', 'umae')
+    list_display = ('sigla', 'nome', 'codigo', 'nome_completo')
     list_display_links = ('sigla', 'nome')
-    search_fields = ('sigla', 'nome')
+    search_fields = ('sigla', 'nome', 'codigo', 'umae')
     list_per_page = 20
 
 
@@ -29,7 +29,7 @@ class ServidorAdmin(admin.ModelAdmin):
     list_display_links = ("siape", "nome", "cpf_display")
     list_per_page = 20
 
-    list_filter = ("local", "cargo__grupo", "cargo__nivel")
+    list_filter = ("local", "cargo__grupo", "cargo__nivel", "cor")
 
     def acoes(self, obj):
         view_name = "admin:{}_{}_change".format(obj._meta.app_label, obj._meta.model_name)

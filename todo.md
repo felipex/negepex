@@ -31,3 +31,6 @@
 
 
 https://django-tips.avilpage.com
+https://api.siorg.economia.gov.br/
+https://assinador.iti.br/assinatura/index.xhtml
+

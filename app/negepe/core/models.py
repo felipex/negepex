@@ -1,10 +1,22 @@
 from django.db import models
+from django.contrib import admin
+from django.db.models import Value
+from django.db.models.functions import Concat
 
 class Unidade(models.Model):
+
     nome = models.CharField(max_length=100)
     sigla = models.CharField(max_length=50)
     codigo = models.CharField("código", max_length=60)
     umae = models.CharField("unidade mãe", max_length=60)
+
+    @property
+    @admin.display(
+        ordering = Concat('umae', Value(' '), 'codigo'),
+        description = 'caminho',
+    )
+    def nome_completo(self):
+        return Unidade.objects.raw(f'select id, nomecompleto from vw_unidade where id = {self.id};')[0].nomecompleto
 
     def __str__(self):
         return f"{self.sigla} -  {self.nome}"

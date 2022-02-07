@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Vega-Lite Bar Chart</title>
+    <meta charset="utf-8" />
+
+    <script src="https://cdn.jsdelivr.net/npm/vega@5.21.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.2.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.20.2"></script>
+
+    <style media="screen">
+      /* Add space between Vega-Embed links  */
+      .vega-actions a {
+        margin-right: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Template for Embedding Vega-Lite Visualization</h1>
+    <!-- Container for the visualization -->
+    <div id="vis"></div>
+    <div id="vis2"></div>
+    <div id="vis3"></div>
+    <div id="vis4"></div>
+    <div id="vis5"></div>
+
+    <script>
+      // Assign the specification to a local variable vlSpec.
+  	fetch('/core/servidores_por_unidade')
+	.then(response => {return response.json()})
+	.then(data => {
+		create_graph({values: data});
+	});
+
+function create_graph(data) {  
+	console.log(data);
+	var vlSpec = {
+        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+        data: data,
+		layer: [{
+        mark: 'bar',
+        encoding: {
+          y: {field: 'unidade', type: 'nominal'},
+          x: {
+            aggregate: 'sum',
+            field: 'total',
+            type: 'quantitative',
+            axis: {
+              title: 'Quantidade de servidores'
+            }
+          }
+		}},
+		{
+			mark: {type: 'text', style: 'label'},
+        encoding: {
+          y: {field: 'unidade', type: 'nominal'},
+          x: {
+            aggregate: 'sum',
+            field: 'total',
+            type: 'quantitative'
+            },
+		  text: {field: 'total', type: 'quantitative'}
+          }
+		}],
+		config: {
+			style: {
+				label: {
+					align: 'left',
+					baseline: 'middle',
+					dx: 3
+				}
+			}
+		}
+    		
+	   };
+      // Embed the visualization in the container with id `vis`
+      vegaEmbed('#vis', vlSpec);
+}
+
+	fetch('/core/servidores_por_unidade_por_sexo')
+	.then(response => {return response.json()})
+	.then(data => {
+		create_graph2({values: data});
+	});
+
+function create_graph2(data) {  
+	console.log(data);
+	var vlSpec = {
+        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+        data: data,
+		layer: [{		
+ 	        mark: 'bar',
+    	    encoding: {
+        		y: {field: 'unidade', type: 'nominal'},
+           		x: {field: 'total',  type: 'quantitative',
+            		axis: {title: 'Quantidade de servidores'}
+          
+			},
+		  	yOffset: {'field': 'sexo'},
+		  	color: {'field': 'sexo'}
+			} },
+			{
+			mark: "text",
+			encoding: {
+        		y: {field: 'unidade', type: 'nominal'},
+				x: {field: 'total',  type: 'quantitative'},
+				text: {field: "total", type: 'quantitative'}
+
+			}}
+
+		],
+		config: {
+			style: {
+				label: {
+					align: 'right',
+					baseline: 'middle',
+					dx: 30
+				}
+			}
+		}
+      };
+      // Embed the visualization in the container with id `vis`
+      vegaEmbed('#vis2', vlSpec);
+}
+
+
+  	fetch('/core/servidores_por_carreira')
+	.then(response => {return response.json()})
+	.then(data => {
+		create_graph3({values: data});
+		create_graph4({values: data})
+	});
+
+function create_graph3(data) {  
+	console.log(data);
+	var vlSpec = {
+        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+        data: data,
+        mark: 'bar',
+        encoding: {
+          y: {field: 'grupo', type: 'nominal',
+			  axis: {title: 'Carreiras'}
+		  },
+          x: {field: 'total',  type: 'quantitative',
+            aggregate: 'sum',
+            axis: {
+              title: 'Quantidade de servidores'
+            }
+          },
+			color: {scale: {scheme: 'dark2'}}
+        }
+      };
+      // Embed the visualization in the container with id `vis`
+      vegaEmbed('#vis3', vlSpec);
+}
+
+function create_graph4(data) {  
+	console.log(data);
+	var vlSpec = {
+        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+        data: data,
+        mark: 'arc',
+        encoding: {
+			color: {field: 'grupo', type: 'nominal', scheme: 'dark',
+			  axis: {title: 'Carreiras'}
+		  },
+          theta: {field: 'total',  type: 'quantitative',
+            aggregate: 'sum',
+            axis: {
+              title: 'Quantidade de servidores'
+            }
+          }//Vega-Lite: A Grammar of Interactive Graphics,
+    	}
+	};
+      // Embed the visualization in the container with id `vis`
+      vegaEmbed('#vis4', vlSpec);
+}
+
+function create_graph5() {  
+	var vlSpec = {
+        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+		data: {url: '/core/servidores_por_carreira'},
+        mark: 'arc',
+        encoding: {
+          color: {field: 'grupo', type: 'nominal', 
+			  axis: {title: 'Carreiras'}
+		  },
+          theta: {field: 'total',  type: 'quantitative', stack: true,
+            aggregate: 'sum',
+            axis: {
+              title: 'Quantidade de servidores'
+            }
+          }
+        }
+	};
+      // Embed the visualization in the container with id `vis`
+      vegaEmbed('#vis5', vlSpec);
+}
+create_graph5();
+
+    </script>
+  </body>
+</html>

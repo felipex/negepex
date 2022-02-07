@@ -26,7 +26,10 @@ SECRET_KEY = 'django-insecure-45f6^d8+#hh1gdz0a)734+f)!)k%zoaa6lf6-1s&^empxkzi%q
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['vps36332.publiccloud.com.br']
+ALLOWED_HOSTS = [
+    'vps36332.publiccloud.com.br',
+    'localhost'
+]
 
 
 # Application definition
