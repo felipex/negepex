@@ -19,6 +19,10 @@
     <h1>Template for Embedding Vega-Lite Visualization</h1>
     <!-- Container for the visualization -->
     <div id="vis"></div>
+    <div id="vis1"></div>
+    <div id="vis_1"></div>
+    <div id="vis_2"></div>
+    <div id="vis_0"></div>
     <div id="vis2"></div>
     <div id="vis3"></div>
     <div id="vis4"></div>
@@ -29,18 +33,19 @@
   	fetch('/core/servidores_por_unidade')
 	.then(response => {return response.json()})
 	.then(data => {
-		create_graph({values: data});
+		//create_graph({values: data});
 	});
 
-function create_graph(data) {  
+function create_graph_0(data) {  
 	console.log(data);
 	var vlSpec = {
         $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
         data: data,
+		transform: [{filter: 'datum.funcao > ""'}],
 		layer: [{
         mark: 'bar',
         encoding: {
-          y: {field: 'unidade', type: 'nominal'},
+          y: {field: 'funcao', type: 'nominal'},
           x: {
             aggregate: 'sum',
             field: 'total',
@@ -53,13 +58,59 @@ function create_graph(data) {
 		{
 			mark: {type: 'text', style: 'label'},
         encoding: {
-          y: {field: 'unidade', type: 'nominal'},
+          y: {field: 'funcao', type: 'nominal'},
           x: {
             aggregate: 'sum',
             field: 'total',
             type: 'quantitative'
             },
-		  text: {field: 'total', type: 'quantitative'}
+		  text: {field: 'total', aggregate: 'sum', type: 'quantitative'}
+          }
+		}],
+		config: {
+			style: {
+				label: {
+					align: 'left',
+					baseline: 'middle',
+					dx: 3
+				}
+			}
+		}
+    		
+	   };
+      // Embed the visualization in the container with id `vis`
+      vegaEmbed('#vis_0', vlSpec);
+}
+
+
+function create_graph(data) {  
+	console.log(data);
+	var vlSpec = {
+        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+        data: data,
+		layer: [{
+        mark: 'bar',
+        encoding: {
+          y: {field: 'lotacao', type: 'nominal'},
+          x: {
+            aggregate: 'sum',
+            field: 'total',
+            type: 'quantitative',
+            axis: {
+              title: 'Quantidade de servidores'
+            }
+          }
+		}},
+		{
+			mark: {type: 'text', style: 'label'},
+        encoding: {
+          y: {field: 'lotacao', type: 'nominal'},
+          x: {
+            aggregate: 'sum',
+            field: 'total',
+            type: 'quantitative'
+            },
+		  text: {field: 'total', aggregate: 'sum', type: 'quantitative'}
           }
 		}],
 		config: {
@@ -75,6 +126,87 @@ function create_graph(data) {
 	   };
       // Embed the visualization in the container with id `vis`
       vegaEmbed('#vis', vlSpec);
+}
+
+  	fetch('/core/servidores2')
+	.then(response => {return response.json()})
+	.then(data => {
+		create_graph1({values: data});
+		create_graph_1({values: data});
+		create_graph_2({values: data});
+		create_graph_0({values: data});
+		create_graph({values: data});
+	});
+
+function create_graph1(data) {  
+	console.log(data);
+	var vlSpec = {
+        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+        data: data,
+        mark: 'bar',
+        encoding: {
+          y: {field: 'cargo_grupo', type: 'nominal',
+			  axis: {title: 'Carreiras'}
+		  },
+          x: {field: 'total',  type: 'quantitative',
+            aggregate: 'sum',
+            axis: {
+              title: 'Quantidade de servidores'
+            }
+          },
+			color: {scale: {scheme: 'dark2'}}
+        }
+      };
+      // Embed the visualization in the container with id `vis`
+      vegaEmbed('#vis1', vlSpec);
+}
+
+function create_graph_1(data) {  
+	console.log(data);
+	var vlSpec = {
+        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+        data: data,
+        mark: 'bar',
+        encoding: {
+          y: {field: 'local', type: 'nominal',
+			  axis: {title: 'Locais'}
+		  },
+          x: {field: 'total',  type: 'quantitative',
+            aggregate: 'sum',
+            axis: {
+              title: 'Quantidade de servidores'
+            }
+          },
+			color: {scale: {scheme: 'dark2'}}
+        }
+      };
+      // Embed the visualization in the container with id `vis`
+      vegaEmbed('#vis_1', vlSpec);
+}
+
+
+function create_graph_2(data) {  
+	console.log(data);
+	var vlSpec = {
+        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+        data: data,
+		transform: [{filter: 'datum.cargo_nivel != "Docente"'}],
+        mark: 'bar',
+        encoding: {
+          y: {field: 'cargo_nivel', type: 'nominal',
+			  axis: {title: 'Nível'}
+		  },
+          x: {field: 'total',  type: 'quantitative',
+            aggregate: 'sum',
+            axis: {
+              title: 'Quantidade de servidores'
+            }
+          },
+			color: {scale: {scheme: 'dark2'}}
+        }
+      };
+      // Embed the visualization in the container with id `vis`
+      vegaEmbed('#vis_2', vlSpec);
 }
 
 	fetch('/core/servidores_por_unidade_por_sexo')
@@ -179,19 +311,33 @@ function create_graph4(data) {
 function create_graph5() {  
 	var vlSpec = {
         $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+		title: {text: "Qtde de Servidores por Carreira", color:"chocalate"},
 		data: {url: '/core/servidores_por_carreira'},
         mark: 'arc',
         encoding: {
-          color: {field: 'grupo', type: 'nominal', 
-			  axis: {title: 'Carreiras'}
+          color: {field: 'grupo', type: 'nominal',
+			  axis: {title: ''}
 		  },
           theta: {field: 'total',  type: 'quantitative', stack: true,
-            aggregate: 'sum',
-            axis: {
-              title: 'Quantidade de servidores'
-            }
+            aggregate: 'sum'
           }
-        }
+        },
+  layer: [{
+    mark: {type: "arc", outerRadius: 100}
+  }, {
+    mark: {type: "text", radius: 115},
+    encoding: {
+      text: {field: "total", type: "quantitative", aggregate: 'sum', color: 'red'}
+    }
+  }], 
+		config: {
+			style: {
+				label: {
+					color: 'red'
+				}
+			}
+		}
+	
 	};
       // Embed the visualization in the container with id `vis`
       vegaEmbed('#vis5', vlSpec);

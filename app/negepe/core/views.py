@@ -4,7 +4,7 @@ from django.template import loader
 from django.shortcuts import render
 
 from core.models import Unidade, Servidor
-
+from django.db import connection
 
 def index(request):
     return HttpResponse('-- Negepe --')
@@ -14,7 +14,6 @@ def dashboard(request):
 
 def servidor_to_json(s):
     return {            
-        'siape': s.siape,
         'id': s.id,
         'cargo': s.cargo.nome,
         'cargo_nivel': s.cargo.get_nivel_display(),
@@ -23,9 +22,11 @@ def servidor_to_json(s):
         'cor': s.get_cor_display(),
         'sexo': s.get_sexo_display(),
         'ch': s.ch,
-        'lotacao': s.lotacao.unidade.nome,
+        'lotacao': s.lotacao.unidade.sigla,
+        'lotacao_nome': s.lotacao.unidade.nome,
         'funcao': s.funcao.codigo if s.funcao else '',
-        'funcao_unidade': s.funcao.unidade.nome if s.funcao else ''
+        'funcao_unidade': s.funcao.unidade.nome if s.funcao else '',
+        'total': 1 
     }
 
 
@@ -35,6 +36,67 @@ def servidores(request):
     for s in ss:
         data.append(servidor_to_json(s))
     return JsonResponse(data, safe=False)
+
+
+def servidor_to_json2(s):
+    return {            
+        'id': s.id,
+        'cargo': s.cargo,
+        'cargo_nivel': s.cargo_nivel,
+        'cargo_grupo': s.cargo_grupo,
+        'local': s.local,
+        'cor': s.cor,
+        'sexo': s.sexo,
+        'ch': s.ch,
+        'lotacao': s.lotacao,
+        'lotacao_nome': s.lotacao_nome,
+        'funcao': s.funcao,
+        'funcao_unidade': s.funcao_unidade,
+        'total': 1 
+    }
+
+
+def dictfetchall(cursor):
+    "Return all rows from a cursor as a dict"
+    columns = [col[0] for col in cursor.description]
+    return [
+        dict(zip(columns, row))
+        for row in cursor.fetchall()
+    ]
+
+def servidores2(request):
+    with connection.cursor() as cursor:
+        cursor.execute('''
+        select s.id, 
+        c.nome as cargo, 
+        case 
+          when c.grupo = 'D' then 'Docente'
+          when c.grupo = 'T' then 'Técnico-Administrativo'
+        end as cargo_grupo, 
+        case
+          when c.nivel = 'X' then 'Docente'
+          when c.nivel = 'C' then 'Fundamental'
+          when c.nivel = 'D' then 'Médio'
+          when c.nivel = 'E' then 'Superior'
+        end as cargo_nivel,
+        case 
+            when s.local = 'J' then 'Juazeiro do Norte' 
+            when s.local = 'B' then 'Barbalha' 
+            when s.local = 'C' then 'Crato' 
+            when s.local = 'S' then 'Brejo Santo' 
+        end as local,
+        s.cor, s.sexo, s.ch,
+        u.sigla as lotacao, u.nome as lotacao_nome,
+        coalesce(f.codigo, '') as funcao, coalesce(uf.nome, '') as funcao_unidade, 1 as total
+        from core_servidor s
+        left join core_cargo c on s.cargo_id = c.id 
+        left join core_funcao f on s.id = f.servidor_id
+        left join core_lotacao l on s.id = l.servidor_id
+        left join core_unidade u on l.unidade_id = u.id
+        left join core_unidade uf on f.unidade_id = uf.id;''')
+
+        data = dictfetchall(cursor)
+        return JsonResponse(data, safe=False)
 
 
 def servidores_por_unidade(request):
