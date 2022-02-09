@@ -85,7 +85,11 @@ def servidores2(request):
             when s.local = 'C' then 'Crato' 
             when s.local = 'S' then 'Brejo Santo' 
         end as local,
-        s.cor, s.sexo, s.ch,
+        s.cor, 
+        case 
+          when s.sexo = 'F' then 'Feminino'
+          else 'Masculino'
+        end as sexo, s.ch,
         u.sigla as lotacao, u.nome as lotacao_nome,
         coalesce(f.codigo, '') as funcao, coalesce(uf.nome, '') as funcao_unidade, 1 as total
         from core_servidor s

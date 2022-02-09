@@ -21,6 +21,7 @@
     <div id="vis"></div>
     <div id="vis1"></div>
     <div id="vis_1"></div>
+    <div id="vis_1_1"></div>
     <div id="vis_2"></div>
     <div id="vis_0"></div>
     <div id="vis2"></div>
@@ -133,6 +134,7 @@ function create_graph(data) {
 	.then(data => {
 		create_graph1({values: data});
 		create_graph_1({values: data});
+		create_graph_1_1({values: data});
 		create_graph_2({values: data});
 		create_graph_0({values: data});
 		create_graph({values: data});
@@ -161,29 +163,79 @@ function create_graph1(data) {
       vegaEmbed('#vis1', vlSpec);
 }
 
+function create_graph_1_1(data) {  
+	console.log(data);
+	var vlSpec = {
+        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+        data: data,
+		mark: 'bar',
+        encoding: {
+          y: {field: 'local', type: 'nominal', 
+			  axis: {title: 'Locais'}
+		  },
+          x: {field: 'total',  type: 'quantitative', 
+            aggregate: 'sum',
+            axis: {
+              title: 'Quantidade de servidores'
+            }
+		  },
+
+		  	yOffset: {'field': 'sexo'},
+		  	color: {'field': 'sexo'}
+
+		},
+		layer: [
+			{
+				mark: 'bar'
+			},
+		{
+			mark: {type: 'text', style: 'label', align: 'left' },
+			encoding: {
+				y: {field: 'local'},
+				text: {field: 'total', aggregate: 'sum'},
+		  	xOffset: {'field': 'sexo'},
+				color: {value: '#777'}
+			}
+		}
+	
+			]
+      };
+      // Embed the visualization in the container with id `vis`
+      vegaEmbed('#vis_1_1', vlSpec);
+}
+
 function create_graph_1(data) {  
 	console.log(data);
 	var vlSpec = {
         $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
         data: data,
-        mark: 'bar',
         encoding: {
-          y: {field: 'local', type: 'nominal',
+          y: {field: 'local', type: 'nominal', 
 			  axis: {title: 'Locais'}
 		  },
-          x: {field: 'total',  type: 'quantitative',
+          x: {field: 'total',  type: 'quantitative', 
             aggregate: 'sum',
             axis: {
               title: 'Quantidade de servidores'
             }
-          },
-			color: {scale: {scheme: 'dark2'}}
-        }
+		  }},
+		layer: [
+			{
+				mark: 'bar'
+			},
+		{
+			mark: {type: 'text', style: 'label', align: 'left' },
+			encoding: {
+				y: {field: 'local'},
+				text: {field: 'total', aggregate: 'sum'}
+			}
+		}
+	
+			]
       };
       // Embed the visualization in the container with id `vis`
       vegaEmbed('#vis_1', vlSpec);
 }
-
 
 function create_graph_2(data) {  
 	console.log(data);
@@ -215,41 +267,35 @@ function create_graph_2(data) {
 		create_graph2({values: data});
 	});
 
+
 function create_graph2(data) {  
 	console.log(data);
 	var vlSpec = {
         $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+		title: {text: 'Servidores por Sexo e por Lotação'},
         data: data,
 		layer: [{		
  	        mark: 'bar',
     	    encoding: {
-        		y: {field: 'unidade', type: 'nominal'},
-           		x: {field: 'total',  type: 'quantitative',
+        		x: {field: 'unidade', type: 'nominal'},
+           		y: {field: 'total',  type: 'quantitative',
             		axis: {title: 'Quantidade de servidores'}
           
 			},
-		  	yOffset: {'field': 'sexo'},
+		  	xOffset: {'field': 'sexo'},
 		  	color: {'field': 'sexo'}
 			} },
 			{
-			mark: "text",
+				mark: {type: "text", baseline: "bottom"},
 			encoding: {
-        		y: {field: 'unidade', type: 'nominal'},
-				x: {field: 'total',  type: 'quantitative'},
-				text: {field: "total", type: 'quantitative'}
-
-			}}
-
-		],
-		config: {
-			style: {
-				label: {
-					align: 'right',
-					baseline: 'middle',
-					dx: 30
-				}
+        		x: {field: 'unidade', type: 'nominal'},
+				y: {field: 'total',  type: 'quantitative'},
+				text: {field: "total", type: 'quantitative'},
+				xOffset: {field: "sexo"}
 			}
-		}
+			}
+		]
+		
       };
       // Embed the visualization in the container with id `vis`
       vegaEmbed('#vis2', vlSpec);
