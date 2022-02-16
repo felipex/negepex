@@ -3,6 +3,8 @@ from django.contrib import admin
 from django.db.models import Value
 from django.db.models.functions import Concat
 
+from datetime import date
+
 class Unidade(models.Model):
 
     nome = models.CharField(max_length=100)
@@ -53,7 +55,7 @@ class Servidor(models.Model):
     )
 
     COR = (
-        ("0", ""),
+        ("0", "-"),
         ("1", "Branca"),
         ("3", "Amarela"),
         ("4", "Parda"),
@@ -103,7 +105,15 @@ class Servidor(models.Model):
     def cpf_display(self):
         return self.cpf[0:3]+'.'+self.cpf[3:6]+'.'+self.cpf[6:9]+'-'+ self.cpf[9:11]
     cpf_display.fget.short_description = "CPF"
- 
+
+
+    def save(self, *args, **kwargs):
+        super(Servidor, self).save(*args, **kwargs)
+        unidade = Unidade.objects.get(sigla='UFCA')
+        l = Lotacao(servidor=self, unidade=unidade, dt_entrada=date.today())
+        l.save()
+        
+
     class Meta:
         verbose_name_plural = "Servidores"
 

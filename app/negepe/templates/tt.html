@@ -16,12 +16,13 @@
     </style>
   </head>
   <body>
-    <h1>Template for Embedding Vega-Lite Visualization</h1>
+    <h1>Dashboard</h1>
     <!-- Container for the visualization -->
     <div id="vis"></div>
     <div id="vis1"></div>
     <div id="vis_1"></div>
     <div id="vis_1_1"></div>
+    <div id="vis_1_2"></div>
     <div id="vis_2"></div>
     <div id="vis_0"></div>
     <div id="vis2"></div>
@@ -135,6 +136,7 @@ function create_graph(data) {
 		create_graph1({values: data});
 		create_graph_1({values: data});
 		create_graph_1_1({values: data});
+		create_graph_1_2({values: data});
 		create_graph_2({values: data});
 		create_graph_0({values: data});
 		create_graph({values: data});
@@ -202,6 +204,48 @@ function create_graph_1_1(data) {
       };
       // Embed the visualization in the container with id `vis`
       vegaEmbed('#vis_1_1', vlSpec);
+}
+
+function create_graph_1_2(data) {  
+	console.log(data);
+	var vlSpec = {
+        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+        data: data,
+		transform: [{filter: 'datum.umae == "122391"'}],
+		mark: 'bar',
+        encoding: {
+          y: {field: 'lotacao', type: 'nominal', 
+			  axis: {title: 'Unidades'}
+		  },
+          x: {field: 'total',  type: 'quantitative', 
+            aggregate: 'sum',
+            axis: {
+              title: 'Quantidade de servidores'
+            }
+		  },
+
+		  	yOffset: {'field': 'sexo'},
+		  	color: {'field': 'sexo'}
+
+		},
+		layer: [
+			{
+				mark: 'bar'
+			},
+		{
+			mark: {type: 'text', style: 'label', align: 'left' },
+			encoding: {
+				y: {field: 'lotacao'},
+				text: {field: 'total', aggregate: 'sum'},
+		  	xOffset: {'field': 'sexo'},
+				color: {value: '#777'}
+			}
+		}
+	
+			]
+      };
+      // Embed the visualization in the container with id `vis`
+      vegaEmbed('#vis_1_2', vlSpec);
 }
 
 function create_graph_1(data) {  

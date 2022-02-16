@@ -108,13 +108,14 @@ importcsvcap:
 	@echo "Copiando arquivo para o container..."
 	docker cp tools/CAP_Controle_de_Pessoal.csv negepe_data:/home/CAP_Controle_de_Pessoal.csv
 	@echo "Importando arquivo..."
-	docker exec -i negepe_data psql -U postgres -d negepex -c "set datestyle to german; copy cap_planilha(nome, sexo, siape, racacor, cpf, dt_nasc, email, cargo, nivel, campus, unidade, funcao, cod_funcao, ch, dt_exercicio) from '/home/CAP_Controle_de_Pessoal.csv' delimiter ',' csv header"
+	docker exec -i negepe_data psql -U postgres -d negepe -c "set datestyle to german; copy cap_planilha(nome, sexo, siape, racacor, cpf, dt_nasc, email, cargo, nivel, campus, unidade, funcao, cod_funcao, ch, dt_exercicio) from '/home/CAP_Controle_de_Pessoal.csv' delimiter ',' csv header"
 	
 restore:
 	cat bknegepe.sql | docker exec -i negepe_data psql -U postgres -d  $(database)
 	
 backup:
 	docker exec -t negepe_data pg_dump -c -U postgres -d $(database) > bknegepe.sql
+	# Não funciona mais. Ver qual o problema.
 	#docker exec -t negepe_data pg_dump -c -U postgres -d $(database) > dump_`date +%d-%m-%Y"_"%H_%M_%S`.sql
 
 sqlexec:

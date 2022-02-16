@@ -29,7 +29,6 @@ def servidor_to_json(s):
         'total': 1 
     }
 
-
 def servidores(request):
     ss = Servidor.objects.all()
     data = []
@@ -37,7 +36,7 @@ def servidores(request):
         data.append(servidor_to_json(s))
     return JsonResponse(data, safe=False)
 
-
+'''
 def servidor_to_json2(s):
     return {            
         'id': s.id,
@@ -54,7 +53,7 @@ def servidor_to_json2(s):
         'funcao_unidade': s.funcao_unidade,
         'total': 1 
     }
-
+'''
 
 def dictfetchall(cursor):
     "Return all rows from a cursor as a dict"
@@ -91,7 +90,8 @@ def servidores2(request):
           else 'Masculino'
         end as sexo, s.ch,
         u.sigla as lotacao, u.nome as lotacao_nome,
-        coalesce(f.codigo, '') as funcao, coalesce(uf.nome, '') as funcao_unidade, 1 as total
+        coalesce(f.codigo, '') as funcao, coalesce(uf.nome, '') as funcao_unidade, 
+        u.umae as umae, 1 as total
         from core_servidor s
         left join core_cargo c on s.cargo_id = c.id 
         left join core_funcao f on s.id = f.servidor_id
