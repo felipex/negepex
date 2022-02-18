@@ -1,12 +1,18 @@
 {% extends "admin/base.html" %}
-
+{% load i18n static %}
 {% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
 
 {% block branding %}
-<div style="margin-right: 10px; background: var(--amarelo); border-radius: 10px; float: left"><img src="http://vps36332.publiccloud.com.br/static/ufca.png" width="70px"> </div>
+	<div style="margin-right: 10px; background: var(--amarelo); border-radius: 10px; float: left">
+		<img src="{% static 'ufca.png' %}" width="70px"> 
+	</div>
+
 	<div style="float: left">
-<h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a></h1>
-</div>
+		<h1 id="site-name">
+			<a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a>
+		</h1>
+	</div>
+
 {% endblock %}
 
 {% block nav-global %}{% endblock %}

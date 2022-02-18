@@ -22,6 +22,13 @@ class CargoAdmin(admin.ModelAdmin):
     list_filter = ('nivel', 'grupo')
 
 
+class LotacaoInline(admin.TabularInline):
+    model = Lotacao
+    extra = 0
+    min_num = 1
+    can_delete = False
+
+
 @admin.register(Servidor)
 class ServidorAdmin(admin.ModelAdmin):
     list_display = ("acoes", "siape", "nome", "cpf_display", "cargo", "lotacao", "funcao")
@@ -31,6 +38,8 @@ class ServidorAdmin(admin.ModelAdmin):
 
     list_filter = ("local", "cargo__grupo", "cargo__nivel", "cor")
 
+    inlines = [LotacaoInline,]
+    
     def acoes(self, obj):
         view_name = "admin:{}_{}_change".format(obj._meta.app_label, obj._meta.model_name)
         link1 = f"https://www.portaltransparencia.gov.br/servidores/consulta?paginacaoSimples=true&tamanhoPagina=&offset=&direcaoOrdenacao=asc&cpf={obj.cpf}&colunasSelecionadas=detalhar%2Ctipo%2Cnome%2Csituacao%2Cfuncao%2Ccargo%2CunidadeOrganizacionalServidorLotacao%2Catividade%2Clicenca&t=M6rlYZUZSXukAsrGPAF0"
@@ -54,6 +63,7 @@ class LotacaoAdmin(admin.ModelAdmin):
     list_per_page = 20
 
     list_filter = ("unidade", "dt_entrada")
+    ordering = ["servidor", "unidade", "-dt_entrada"]
 
 
 @admin.register(Funcao)

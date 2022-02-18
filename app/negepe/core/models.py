@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.db.models import Value
 from django.db.models.functions import Concat
 
-from datetime import date
+from datetime import date, timedelta
 
 class Unidade(models.Model):
 
@@ -107,12 +107,21 @@ class Servidor(models.Model):
     cpf_display.fget.short_description = "CPF"
 
 
-    def save(self, *args, **kwargs):
+    ### O problema está sendo resolvido de forma meia-boca no admin.
+    ### Mas vai servir por agora.
+    def save_LIXO(self, *args, **kwargs):
+        IS_INSERT = self.pk is None
         super(Servidor, self).save(*args, **kwargs)
-        unidade = Unidade.objects.get(sigla='UFCA')
-        l = Lotacao(servidor=self, unidade=unidade, dt_entrada=date.today())
-        l.save()
-        
+        if (IS_INSERT):
+            ### TO-DO: Essa amarração está muito feia. Seria bom criar uma configuração ou fazer logo a inclusão imediata da lotação.
+            unidade = Unidade.objects.get(sigla='UFCA')
+            l = Lotacao(
+                servidor=self, 
+                unidade=unidade, 
+                dt_entrada=date.today()
+            )
+            l.save()
+            
 
     class Meta:
         verbose_name_plural = "Servidores"
@@ -122,32 +131,49 @@ class Servidor(models.Model):
         return self.nome
 
 
+def get_default_lotacao():
+    return Unidade.objects.get(sigla='UFCA')
+
+
 class Lotacao(models.Model):
     servidor = models.ForeignKey(Servidor, on_delete=models.PROTECT)
-    unidade = models.ForeignKey(Unidade, on_delete=models.PROTECT)
-    dt_entrada = models.DateField("data de entrada")
+    unidade = models.ForeignKey(Unidade, on_delete=models.PROTECT, default=get_default_lotacao)
+    dt_entrada = models.DateField("data de entrada", default=date.today())
     dt_saida = models.DateField("data de saída", null=True, blank=True)
     dt_inclusao = models.DateField("inclusão", null=False, blank=False, auto_now_add=True)
 
     class Meta:
         verbose_name = "Lotação"
         verbose_name_plural = "Lotações"
+        ordering = ['-dt_entrada']
 
     def __str__(self):
         return f"{self.unidade.sigla} - {self.unidade.nome}"
 
+    def save(self, *args, **kwargs):
+        print('->', self)
+        if (self.pk is None):
+            ult_lotacao = self.servidor.lotacao
+            print('-->', ult_lotacao)
+            if (ult_lotacao.dt_saida is None):
+                dt_saida = self.dt_entrada - timedelta(days=1)
+                ult_lotacao.dt_saida = dt_saida
+                ult_lotacao.save()
+
+        super(Lotacao, self).save(*args, **kwargs)
+
 
 class Funcao(models.Model):
     CODIGO = (
-        ("CD1", "Cargo de Direção 1"),
-        ("CD2", "Cargo de Direção 2"),
-        ("CD3", "Cargo de Direção 3"),
-        ("CD4", "Cargo de Direção 4"),
-        ("FG1", "Função Gratificada 1"),
-        ("FG2", "Função Gratificada 2"),
-        ("FG3", "Função Gratificada 3"),
-        ("FG4", "Função Gratificada 4"),
-        ("FUC1", "Coordenação de Curso"),
+        ("CD1", "CD 000.1"),
+        ("CD2", "CD 000.2"),
+        ("CD3", "CD 000.3"),
+        ("CD4", "CD 000.4"),
+        ("FG1", "FG 000.1"),
+        ("FG2", "FG 000.2"),
+        ("FG3", "FG 000.3"),
+        ("FG4", "FG 000.4"),
+        ("FUC1", "FUC 000.1"),
     )
 
     servidor = models.ForeignKey(Servidor, on_delete=models.PROTECT)

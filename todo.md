@@ -34,3 +34,5 @@ https://django-tips.avilpage.com
 https://api.siorg.economia.gov.br/
 https://assinador.iti.br/assinatura/index.xhtml
 
+
+http://painel.pep.planejamento.gov.br/QvAJAXZfc/opendoc.htm?document=painelpep.qvw&lang=en-US&host=Local&anonymous=true

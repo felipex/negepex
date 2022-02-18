@@ -1,0 +1,120 @@
+{% extends "base_negepe.html" %}
+{% load i18n static %}
+{% block extrahead %}
+    <script src="https://cdn.jsdelivr.net/npm/vega@5.21.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.2.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.20.2"></script>
+	<script scr="{% static 'js/graficos.js' %}"></script>
+{% endblock %}
+{% block title %}
+Informações da PROGEP
+{% endblock %}
+
+{% block branding %}
+	<div style="margin-right: 10px; background: var(--amarelo); border-radius: 10px; float: left">
+		<img src="{% static 'ufca.png' %}" width="70px"> 
+	</div>
+
+	<div style="float: left">
+		<h1 id="site-name">
+		Informações da PROGEP
+		</h1>
+	</div>
+
+{% endblock %}
+
+{% block pretitle %}{% endblock %}
+
+{% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
+
+{% block content_subtitle %}{% if subtitle %}<h2>{{ subtitle }}</h2>{% endif %}{% endblock %}
+{% block nav-sidebar %}
+<nav class="sticky" id="nav-sidebar">
+<div class="module">
+      <table>
+        <caption>
+          Opções de Consulta
+        </caption>
+        
+          <tr >
+            
+              <th scope="row"><a data-grafico="graph01" class="links" href="#">Servidores por unidade e por sexo</a></th>
+            
+          </tr>
+        
+       
+      </table>
+    </div>
+</nav>
+{% endblock %}
+ 
+{% block content %}
+<script>
+
+const GRAPH = {
+  'graph01': (data) => {  
+	console.log(data);
+	var vlSpec = {
+        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+        data: data,
+		mark: 'bar',
+        encoding: {
+          y: {field: 'local', type: 'nominal', 
+			  axis: {title: 'Locais'}
+		  },
+          x: {field: 'total',  type: 'quantitative', 
+            aggregate: 'sum',
+            axis: {
+              title: 'Quantidade de servidores'
+            }
+		  },
+
+		  	yOffset: {'field': 'sexo'},
+		  	color: {'field': 'sexo'}
+
+		},
+		layer: [
+			{
+				mark: 'bar'
+			},
+		{
+			mark: {type: 'text', style: 'label', align: 'left' },
+			encoding: {
+				y: {field: 'local'},
+				text: {field: 'total', aggregate: 'sum'},
+		  	xOffset: {'field': 'sexo'},
+				color: {value: '#777'}
+			}
+		}
+	
+			]
+      };
+      // Embed the visualization in the container with id `vis`
+      vegaEmbed('#vis', vlSpec);
+}
+}
+const links = document.querySelectorAll(".links");
+console.log(links);
+links.forEach(
+	(link) => {
+		link.addEventListener('click', (e) => {
+			showGraph(e.target.dataset.grafico);
+		})
+	}
+)
+
+function showGraph(graph) {
+    console.log(graph);
+	fetch('/core/servidores2')
+		.then(response => {return response.json()})
+		.then(data => {
+			GRAPH[graph]({values: data});
+		});
+}
+
+
+</script>
+
+		<div id="vis"></div>
+{% endblock %}
+

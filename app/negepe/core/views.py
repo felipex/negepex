@@ -9,8 +9,11 @@ from django.db import connection
 def index(request):
     return HttpResponse('-- Negepe --')
 
-def dashboard(request):
+def tt(request):
     return render(request, 'tt.html')
+
+def dashboard(request):
+    return render(request, 'dashboard.html')
 
 def servidor_to_json(s):
     return {            
