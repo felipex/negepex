@@ -3,8 +3,9 @@ from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from django.shortcuts import render
 
-from core.models import Unidade, Servidor
+from core.models import Unidade, Servidor, Lotacao
 from django.db import connection
+from django.db.models import Prefetch
 
 def index(request):
     return HttpResponse('-- Negepe --')
@@ -19,8 +20,8 @@ def servidor_to_json(s):
     return {            
         'id': s.id,
         'cargo': s.cargo.nome,
-        'cargo_nivel': s.cargo.get_nivel_display(),
         'cargo_grupo': s.cargo.get_grupo_display(),
+        'cargo_nivel': s.cargo.get_nivel_display(),
         'local': s.get_local_display(),
         'cor': s.get_cor_display(),
         'sexo': s.get_sexo_display(),
@@ -29,11 +30,13 @@ def servidor_to_json(s):
         'lotacao_nome': s.lotacao.unidade.nome,
         'funcao': s.funcao.codigo if s.funcao else '',
         'funcao_unidade': s.funcao.unidade.nome if s.funcao else '',
+        'umae': s.lotacao.unidade.umae,
         'total': 1 
     }
 
 def servidores(request):
-    ss = Servidor.objects.all()
+    prefetch = Prefetch('lotacao_set')
+    ss = Servidor.objects.prefetch_related(prefetch).all()
     data = []
     for s in ss:
         data.append(servidor_to_json(s))
@@ -100,7 +103,14 @@ def servidores2(request):
         left join core_funcao f on s.id = f.servidor_id
         left join core_lotacao l on s.id = l.servidor_id
         left join core_unidade u on l.unidade_id = u.id
-        left join core_unidade uf on f.unidade_id = uf.id;''')
+        left join core_unidade uf on f.unidade_id = uf.id
+
+        where l.dt_entrada = (select max(dt_entrada) from core_lotacao l2 
+                              where l2.servidor_id = l.servidor_id)
+        and (f.dt_entrada is null 
+             or f.dt_entrada = (select max(dt_entrada) from core_funcao f2 
+                              where f2.servidor_id = f.servidor_id))
+        ;''')
 
         data = dictfetchall(cursor)
         return JsonResponse(data, safe=False)
