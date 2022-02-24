@@ -21,5 +21,6 @@ admin.site.site_title = "PROGEP - UFCA"
 
 urlpatterns = [
     path('core/', include('core.urls')),
+    path('data/', include('data.urls')),
     path('admin/', admin.site.urls),
 ]

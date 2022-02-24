@@ -115,6 +115,46 @@ def servidores2(request):
         data = dictfetchall(cursor)
         return JsonResponse(data, safe=False)
 
+def get_graph_spec(request):
+    spec = {
+    '$schema': 'https://vega.github.io/schema/vega-lite/v5.json',
+    'mark': 'bar',
+    'encoding': {
+        'y': {
+            'field': 'local', 
+            'type': 'nominal', 
+            'axis': {'title': 'Locais'}
+        },
+        'x': {
+            'field': 'total',  
+            'type': 'quantitative', 
+            'aggregate': 'sum',
+            'axis': {
+                'title': 'Quantidade de servidores'
+            }
+        },
+        'yOffset': {'field': 'cargo_grupo'},
+        'color': {'field': 'cargo_grupo', 'title': 'Carreiras'}
+    },
+    'layer': [
+        {'mark': 'bar'},
+        {
+            'mark': {
+                'type': 'text', 
+                'style': 'label', 
+                'align': 'left' 
+            },
+            'encoding': {
+                'y': {'field': 'local'},
+                'text': {'field': 'total', 'aggregate': 'sum'},
+                'xOffset': {'field': 'cargo_grupo'},
+                'color': {'value': '#777'}
+            }
+        }
+    ]
+    }
+    return JsonResponse(spec, safe=False)
+
 
 def servidores_por_unidade(request):
     unidades = Unidade.objects.raw('select u.id, u.nome, count(*) as total from core_servidor s, core_lotacao l, core_unidade u where s.id = l.servidor_id and u.id = l.unidade_id  group by u.id, u.nome;')

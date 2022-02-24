@@ -49,7 +49,7 @@ run_:
 	    #django-admin startproject negepe	
 
 run:
-	docker run --rm -p $(PORT):$(PORT) \
+	docker run -d --rm -p $(PORT):$(PORT) \
 		--expose $(PORT) \
 		--env-file .env \
 		--mount type=bind,source=$(PWD)/app,target=/home/appuser/webapp \

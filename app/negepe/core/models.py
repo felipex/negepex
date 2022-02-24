@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib import admin
 from django.db.models import Value
 from django.db.models.functions import Concat
+from django.utils import timezone 
 
 from datetime import date, timedelta
 
@@ -138,7 +139,7 @@ def get_default_lotacao():
 class Lotacao(models.Model):
     servidor = models.ForeignKey(Servidor, on_delete=models.PROTECT)
     unidade = models.ForeignKey(Unidade, on_delete=models.PROTECT, default=get_default_lotacao)
-    dt_entrada = models.DateField("data de entrada", default=date.today())
+    dt_entrada = models.DateField("data de entrada", default=timezone.localdate())
     dt_saida = models.DateField("data de saída", null=True, blank=True)
     dt_inclusao = models.DateField("inclusão", null=False, blank=False, auto_now_add=True)
 

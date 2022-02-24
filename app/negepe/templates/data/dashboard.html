@@ -1,0 +1,105 @@
+{% extends "base_negepe.html" %}
+{% load i18n static %}
+{% block extrahead %}
+    <script src="https://cdn.jsdelivr.net/npm/vega@5.21.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.2.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.20.2"></script>
+	<script scr="{% static 'js/graficos.js' %}"></script>
+{% endblock %}
+{% block title %}
+Informações da PROGEP
+{% endblock %}
+
+{% block branding %}
+	<div style="margin-right: 10px; background: var(--amarelo); border-radius: 10px; float: left">
+		<img src="{% static 'ufca.png' %}" width="70px"> 
+	</div>
+
+	<div style="float: left">
+		<h1 id="site-name">
+		Informações da PROGEP
+		</h1>
+	</div>
+
+{% endblock %}
+
+{% block pretitle %}{% endblock %}
+
+{% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
+
+{% block content_subtitle %}{% if subtitle %}<h2>{{ subtitle }}</h2>{% endif %}{% endblock %}
+{% block nav-sidebar %}
+<nav class="sticky" id="nav-sidebar">
+<div class="module">
+	  <table>
+        <caption>
+          Opções de Consulta
+        </caption>
+ 	  {% for g in graficos %}
+	  	{% if g.ativo %}
+	  <tr><th scope="row"><a data-id="id_{{g.id}}" data-grafico="graph" class="links" href="#">{{g.titulo}}</a></th></tr>
+	  	{% endif %}
+	  {% endfor %}
+	  </table>
+    </div>
+</nav>
+{% endblock %}
+ 
+{% block content %}
+<script>
+	var specs = {};
+{% for g in graficos %}
+	{% if g.ativo %}
+	specStr = `{{g.especificacao|safe}}`;
+	eval(`spec = ${specStr}`)
+
+	specs["id_{{g.id}}"] = spec;
+	{% endif %}
+{% endfor %}
+
+const GRAPH = {
+	'graph': (data, id) => {
+				let spec = specs[id];
+				spec['data'] = {};
+				spec['data']['values'] = data
+				let vis = document.querySelector("#vis");
+				const div = document.createElement('div');
+				const idDiv = `div_${id}`;
+				div.setAttribute("id", idDiv);
+				vis.appendChild(div);
+		vegaEmbed(`#${idDiv}`, spec, {"renderer": "svg", "config": {"range": {
+    "category": [
+      "#f5be56",
+      "#50bdca",
+      "#75b747",
+      "#f08e60",
+      "#532b1d"
+    ]
+		}}});
+      			//vegaEmbed('#vis', spec);
+	}
+}
+
+const links = document.querySelectorAll(".links");
+links.forEach(
+	(link) => {
+		link.addEventListener('click', (e) => {
+			showGraph(e.target.dataset.grafico, e.target.dataset.id);
+		})
+	}
+)
+
+function showGraph(graph, id) {
+    console.log(graph, id);
+	fetch('/core/servidores2')
+		.then(response => {return response.json()})
+		.then(data => {
+			GRAPH[graph](data, id);
+		});
+}
+
+</script>
+
+		<div id="vis"></div>
+{% endblock %}
+

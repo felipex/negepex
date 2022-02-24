@@ -28,6 +28,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'vps36332.publiccloud.com.br',
+    '193.123.109.22',
     'localhost'
 ]
 
@@ -36,6 +37,7 @@ ALLOWED_HOSTS = [
 
 INSTALLED_APPS = [
     'core',
+    'data',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -122,7 +124,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'pt-br'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Fortaleza'
 
 USE_I18N = True
 
@@ -135,7 +137,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static/"),
+#    os.path.join(BASE_DIR, "static/"),
 ]
 print(STATIC_ROOT)
 print(STATICFILES_DIRS)

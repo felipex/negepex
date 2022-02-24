@@ -39,6 +39,7 @@ Informações da PROGEP
           <tr >
             
               <th scope="row"><a data-grafico="graph01" class="links" href="#">Servidores por unidade e por sexo</a></th>
+              <th scope="row"><a data-grafico="graph02" class="links" href="#">--Servidores por unidade e por sexo</a></th>
             
           </tr>
         
@@ -91,7 +92,19 @@ const GRAPH = {
       };
       // Embed the visualization in the container with id `vis`
       vegaEmbed('#vis', vlSpec);
-}
+	},
+	'graph02': (data) => {
+		console.log(data)
+		fetch('/core/get_graph_spec')
+			.then((response) => {
+				return response.json()
+			})
+			.then((json) => {
+				console.log(json)
+				json['data'] = data
+      			vegaEmbed('#vis', json);
+			})
+	}
 }
 const links = document.querySelectorAll(".links");
 console.log(links);
