@@ -64,9 +64,19 @@ const GRAPH = {
 				spec['data']['values'] = data
 				let vis = document.querySelector("#vis");
 				const div = document.createElement('div');
+				div.style = 'border: 1px solid #f5be56;'; 
 				const idDiv = `div_${id}`;
-				div.setAttribute("id", idDiv);
+				//div.setAttribute("id", idDiv);
 				vis.appendChild(div);
+
+				const title = document.createElement('h1'); 
+				title.textContent= 'Título do Gráfico';
+				div.appendChild(title);
+				
+				const innerDiv = document.createElement('div');
+				innerDiv.setAttribute("id", idDiv);
+				div.appendChild(innerDiv);
+
 		vegaEmbed(`#${idDiv}`, spec, {"renderer": "svg", "config": {"range": {
     "category": [
       "#f5be56",

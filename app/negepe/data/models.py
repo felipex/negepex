@@ -5,6 +5,9 @@ class Grafico(models.Model):
     especificacao = models.TextField()
     ativo = models.BooleanField(default=True)
 
+    class Meta:
+        ordering = ["titulo"]
+
     def __str__(self):
         return self.titulo
 
