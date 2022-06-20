@@ -37,7 +37,10 @@ Informações da PROGEP
         </caption>
  	  {% for g in graficos %}
 	  	{% if g.ativo %}
-	  <tr><th scope="row"><a data-id="id_{{g.id}}" data-grafico="graph" class="links" href="#">{{g.titulo}}</a></th></tr>
+		<tr><th scope="row"><a data-id="id_{{g.id}}" data-grafico="graph" class="links" data-titulo="{{g.titulo}}" data-fonte="{{g.fonte}}" href="#">{{g.titulo}}</a></th></tr>
+		<script>
+			console.log("{{g.titulo}}", "{{g.fonte}}");
+			</script>
 	  	{% endif %}
 	  {% endfor %}
 	  </table>
@@ -58,7 +61,7 @@ Informações da PROGEP
 {% endfor %}
 
 const GRAPH = {
-	'graph': (data, id) => {
+	'graph': (data, id, target) => {
 				let spec = specs[id];
 				spec['data'] = {};
 				spec['data']['values'] = data
@@ -70,7 +73,7 @@ const GRAPH = {
 				vis.appendChild(div);
 
 				const title = document.createElement('h1'); 
-				title.textContent= 'Título do Gráfico';
+				title.textContent= target.dataset.titulo
 				div.appendChild(title);
 				
 				const innerDiv = document.createElement('div');
@@ -94,17 +97,19 @@ const links = document.querySelectorAll(".links");
 links.forEach(
 	(link) => {
 		link.addEventListener('click', (e) => {
-			showGraph(e.target.dataset.grafico, e.target.dataset.id);
+			showGraph(e.target.dataset.grafico, e.target.dataset.id, e.target);
 		})
 	}
 )
 
-function showGraph(graph, id) {
-    console.log(graph, id);
-	fetch('/core/servidores2')
+function showGraph(graph, id, target) {
+    console.log(target.dataset.fonte);
+	const fonte = target.dataset.fonte == "" ? "/core/servidores2" : target.dataset.fonte;
+
+	fetch(fonte)
 		.then(response => {return response.json()})
 		.then(data => {
-			GRAPH[graph](data, id);
+			GRAPH[graph](data, id, target);
 		});
 }
 

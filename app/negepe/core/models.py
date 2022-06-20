@@ -6,12 +6,17 @@ from django.utils import timezone
 
 from datetime import date, timedelta
 
+
 class Unidade(models.Model):
 
     nome = models.CharField(max_length=100)
     sigla = models.CharField(max_length=50)
     codigo = models.CharField("código", max_length=60)
     umae = models.CharField("unidade mãe", max_length=60)
+    #unidade_primaria = models.ForeignKey(
+    #    Unidade,
+    #    verbose_name='unidade primária'
+    #)
 
     @property
     @admin.display(
@@ -20,6 +25,19 @@ class Unidade(models.Model):
     )
     def nome_completo(self):
         return Unidade.objects.raw(f'select id, nomecompleto from vw_unidade where id = {self.id};')[0].nomecompleto
+
+    @property
+    @admin.display(
+        ordering = 'umae',
+        description = 'mae',
+    )
+    def mae(self):
+        if self.umae == '000000':
+            return ''
+        else:
+            return Unidade.objects.raw(f'select id, m.sigla from core_unidade m where (m.codigo = \'{self.umae}\');')[0].sigla
+
+
 
     def __str__(self):
         return f"{self.sigla} -  {self.nome}"
@@ -89,7 +107,15 @@ class Servidor(models.Model):
 
     @property
     def lotacao(self):
-        return Lotacao.objects.filter(servidor=self).order_by('-dt_entrada').all()[0]
+        '''
+        Retorna a última lotação cadastrata para este servidor.  
+        '''
+        lotacoes = Lotacao.objects.filter(servidor=self).order_by('-dt_entrada').all()
+        if len(lotacoes) == 0:
+            return None
+
+        return lotacoes[0]
+
 
     lotacao.fget.short_description = "lotação"
 
@@ -106,6 +132,13 @@ class Servidor(models.Model):
     def cpf_display(self):
         return self.cpf[0:3]+'.'+self.cpf[3:6]+'.'+self.cpf[6:9]+'-'+ self.cpf[9:11]
     cpf_display.fget.short_description = "CPF"
+
+
+    @property
+    def ativo(self):
+        return self.dt_desligamento == None
+
+    ativo.fget.short_description = "em ativiade"
 
 
     ### O problema está sendo resolvido de forma meia-boca no admin.
@@ -139,7 +172,7 @@ def get_default_lotacao():
 class Lotacao(models.Model):
     servidor = models.ForeignKey(Servidor, on_delete=models.PROTECT)
     unidade = models.ForeignKey(Unidade, on_delete=models.PROTECT, default=get_default_lotacao)
-    dt_entrada = models.DateField("data de entrada", default=timezone.localdate())
+    dt_entrada = models.DateField("data de entrada", default=timezone.localdate)
     dt_saida = models.DateField("data de saída", null=True, blank=True)
     dt_inclusao = models.DateField("inclusão", null=False, blank=False, auto_now_add=True)
 
@@ -152,10 +185,14 @@ class Lotacao(models.Model):
         return f"{self.unidade.sigla} - {self.unidade.nome}"
 
     def save(self, *args, **kwargs):
-        print('->', self)
-        if (self.pk is None):
+        '''
+        Ao incluir uma nova lotação para o servidor a lotação anterior deve
+        ficar com a data de saída igual ao dia anterior da nova.
+        '''
+        if (self.pk is None): # Se for inclusão.
             ult_lotacao = self.servidor.lotacao
-            print('-->', ult_lotacao)
+        
+        if ult_lotacao: 
             if (ult_lotacao.dt_saida is None):
                 dt_saida = self.dt_entrada - timedelta(days=1)
                 ult_lotacao.dt_saida = dt_saida

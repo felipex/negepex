@@ -44,8 +44,8 @@ run_:
 		--mount type=bind,source=$(PWD)/app,target=/home/appuser/webapp \
 		--network $(NETWORK) \
 		--name $(APP) \
-		$(APP) \
-		bash
+		$(APP) 
+		#bash
 	    #django-admin startproject negepe	
 
 run:
@@ -114,9 +114,16 @@ restore:
 	cat bknegepe.sql | docker exec -i negepe_data psql -U postgres -d  $(database)
 	
 backup:
-	docker exec -t negepe_data pg_dump -c -U postgres -d $(database) > bknegepe.sql
-	# Não funciona mais. Ver qual o problema.
-	#docker exec -t negepe_data pg_dump -c -U postgres -d $(database) > dump_`date +%d-%m-%Y"_"%H_%M_%S`.sql
+	docker exec -t negepe_data pg_dump -c -U postgres -d $(database) > bknegepe_`date +%d-%m-%Y"_"%H_%M_%S`.sql
+
+makemigrations:
+	docker exec -t negepe python manage.py makemigrations
+
+migrate:
+	docker exec -t negepe python manage.py migrate
+
+shell:
+	docker exec -it negepe python manage.py shell
 
 sqlexec:
 	@echo "Copiando o arquivo."

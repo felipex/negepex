@@ -34,5 +34,16 @@ https://django-tips.avilpage.com
 https://api.siorg.economia.gov.br/
 https://assinador.iti.br/assinatura/index.xhtml
 
+http://painel.pep.planejamento.gov.br/QvAJAXZfc/opendoc.htm?document=painelpep.qvw&lang=en-US&host=Local&anonymous=true
 
 http://painel.pep.planejamento.gov.br/QvAJAXZfc/opendoc.htm?document=painelpep.qvw&lang=en-US&host=Local&anonymous=true
+
+https://books.agiliq.com/projects/django-admin-cookbook/en/latest/filtering_calculated_fields.html
+
+https://django-tips.avilpage.com/en/latest/index.html
+
+https://django.how/category/models/page/4/
+
+https://learndjango.com/tutorials/django-best-practices-models
+
+

@@ -7,7 +7,7 @@ admin.site.disable_action('delete_selected')
 
 @admin.register(Unidade)
 class UnidadeAdmin(admin.ModelAdmin):
-    list_display = ('sigla', 'nome', 'codigo', 'nome_completo')
+    list_display = ('sigla',  'nome', 'mae', 'codigo', 'nome_completo')
     list_display_links = ('sigla', 'nome')
     search_fields = ('sigla', 'nome', 'codigo', 'umae')
     list_per_page = 20
@@ -29,17 +29,51 @@ class LotacaoInline(admin.TabularInline):
     can_delete = False
 
 
+class EhAtivo(admin.SimpleListFilter):
+    title = 'Em atividade'
+    parameter_name = 'dt_desligamento'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('Sim', 'Em atividade'),
+            ('Nao', 'Desligado'),
+        )
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == 'Sim':
+            return queryset.filter(dt_desligamento__isnull=True)
+        elif value == 'Nao':
+            return queryset.filter(dt_desligamento__isnull=False)
+
+        return queryset
+
+
 @admin.register(Servidor)
 class ServidorAdmin(admin.ModelAdmin):
-    list_display = ("acoes", "siape", "nome", "cpf_display", "cargo", "lotacao", "funcao")
+    list_display = ("acoes","ativo", "siape", "nome", "cpf_display", "cargo", "lotacao", "funcao")
+    autocomplete_fields = ("cargo",)
     search_fields = ("siape", "nome", "cpf", "cargo__nome", "lotacao__unidade__nome", "lotacao__unidade__sigla")
     list_display_links = ("siape", "nome", "cpf_display")
     list_per_page = 20
 
-    list_filter = ("local", "cargo__grupo", "cargo__nivel", "cor")
+    list_filter = ("local", "cargo__grupo", "cargo__nivel", "cor", EhAtivo)
 
     inlines = [LotacaoInline,]
+  
+    #def get_queryset(self, request):
+    #    queryset = super().get_queryset(request)
+    #    queryset = queryset.annotate(
+    #        _ativo = Ra("")
+    #    )
+
+    def ativo(self, obj):
+        return obj.ativo 
     
+    ativo.admin_order_field = 'dt_desligamento'
+    ativo.boolean = True
+
+
     def acoes(self, obj):
         view_name = "admin:{}_{}_change".format(obj._meta.app_label, obj._meta.model_name)
         link1 = f"https://www.portaltransparencia.gov.br/servidores/consulta?paginacaoSimples=true&tamanhoPagina=&offset=&direcaoOrdenacao=asc&cpf={obj.cpf}&colunasSelecionadas=detalhar%2Ctipo%2Cnome%2Csituacao%2Cfuncao%2Ccargo%2CunidadeOrganizacionalServidorLotacao%2Catividade%2Clicenca&t=M6rlYZUZSXukAsrGPAF0"
@@ -59,16 +93,19 @@ class ServidorAdmin(admin.ModelAdmin):
 @admin.register(Lotacao)
 class LotacaoAdmin(admin.ModelAdmin):
     list_display = ("unidade", "servidor", "dt_entrada")
+    autocomplete_fields = ("unidade", "servidor",)
     search_fields = ("unidade__nome", "unidade__sigla", "servidor__nome")
     list_per_page = 20
 
     list_filter = ("unidade", "dt_entrada")
     ordering = ["servidor", "unidade", "-dt_entrada"]
+    date_hierarchy = 'dt_entrada'
 
 
 @admin.register(Funcao)
 class FuncaoAdmin(admin.ModelAdmin):
     list_display = ("servidor", "codigo", "descricao", "unidade", "dt_entrada")
+    autocomplete_fields = ("servidor", "unidade",)
     search_fields = ("unidade__nome", "unidade__sigla", "servidor__nome")
     list_per_page = 20
 
