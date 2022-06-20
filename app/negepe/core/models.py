@@ -222,6 +222,10 @@ class Funcao(models.Model):
     dt_saida = models.DateField("data de saída", null=True, blank=True)
     dt_inclusao = models.DateField("inclusão", null=False, blank=False, auto_now_add=True)
 
+    @property
+    def ativa(self):
+        return self.dt_saida is None
+
     def __str__(self):
         return self.descricao
 

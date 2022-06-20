@@ -109,7 +109,7 @@ def servidores2(request):
                               where l2.servidor_id = l.servidor_id)
         and (f.dt_entrada is null 
              or f.dt_entrada = (select max(dt_entrada) from core_funcao f2 
-                              where f2.servidor_id = f.servidor_id))
+                              where f2.servidor_id = f.servidor_id and f2.dt_saida is null))
         ;''')
 
         data = dictfetchall(cursor)

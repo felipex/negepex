@@ -102,14 +102,43 @@ class LotacaoAdmin(admin.ModelAdmin):
     date_hierarchy = 'dt_entrada'
 
 
+
+class EhAtiva(admin.SimpleListFilter):
+    title = 'ativa'
+    parameter_name = 'dt_saida'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('Sim', 'Sim'),
+            ('Nao', 'Não'),
+        )
+
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == 'Sim':
+            return queryset.filter(dt_saida__isnull=True)
+        elif value == 'Nao':
+            return queryset.filter(dt_saida__isnull=False)
+
+        return queryset
+
+
+
 @admin.register(Funcao)
 class FuncaoAdmin(admin.ModelAdmin):
-    list_display = ("servidor", "codigo", "descricao", "unidade", "dt_entrada")
+    list_display = ("ativa", "servidor", "codigo", "descricao", "unidade", "dt_entrada")
     autocomplete_fields = ("servidor", "unidade",)
     search_fields = ("unidade__nome", "unidade__sigla", "servidor__nome")
     list_per_page = 20
 
-    list_filter = ("codigo", "dt_entrada")
+    list_filter = ("codigo", "dt_entrada", EhAtiva)
+
+    def ativa(self, obj):
+        return obj.ativa 
+    
+    ativa.admin_order_field = 'dt_saida'
+    ativa.boolean = True
 
 
 

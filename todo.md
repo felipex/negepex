@@ -1,4 +1,5 @@
-
+### Funções
+[ ] Colocar os campos na ordem que aparecem nas portarias 
 
 ### Unidades
 [ ] Tratar a umae e colocar o caminho completo;
@@ -30,6 +31,7 @@
 
 
 
+https://books.agiliq.com/projects/django-admin-cookbook/en/latest/filtering_calculated_fields.html
 https://django-tips.avilpage.com
 https://api.siorg.economia.gov.br/
 https://assinador.iti.br/assinatura/index.xhtml
