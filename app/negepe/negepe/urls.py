@@ -20,6 +20,7 @@ admin.site.site_header = "NeGePe"
 admin.site.site_title = "PROGEP - UFCA"
 
 urlpatterns = [
+    path('app/', include('core.urls')),
     path('core/', include('core.urls')),
     path('data/', include('data.urls')),
     path('admin/', admin.site.urls),

@@ -8,13 +8,17 @@ from django.db import connection
 from django.db.models import Prefetch
 
 def index(request):
-    return HttpResponse('-- Negepe --')
+    return render(request, 'index.html')
 
 def tt(request):
     return render(request, 'tt.html')
 
 def dashboard(request):
     return render(request, 'dashboard.html')
+
+def gratificacao(request):
+    return render(request, 'gratificacao.html')
+
 
 def servidor_to_json(s):
     return {            
