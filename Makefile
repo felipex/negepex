@@ -111,7 +111,7 @@ importcsvcap:
 	docker exec -i negepe_data psql -U postgres -d negepe -c "set datestyle to german; copy cap_planilha(nome, sexo, siape, racacor, cpf, dt_nasc, email, cargo, nivel, campus, unidade, funcao, cod_funcao, ch, dt_exercicio) from '/home/CAP_Controle_de_Pessoal.csv' delimiter ',' csv header"
 	
 restore:
-	cat bknegepe.sql | docker exec -i negepe_data psql -U postgres -d  $(database)
+	cat bk/bknegepe.sql | docker exec -i negepe_data psql -U postgres -d  $(database)
 	
 backup:
 	docker exec -t negepe_data pg_dump -c -U postgres -d $(database) > bknegepe_`date +%d-%m-%Y"_"%H_%M_%S`.sql
@@ -133,3 +133,6 @@ sqlexec:
 
 sqlteste:
 	docker exec -it negepe_data psql -U postgres -d teste -c "select * from campus;"
+	
+copybk:
+	scp "$(VPS_USER)@$(VPS_HOST):/home/negepe/negepe2/bk/negepe_$(date)_12*" ./bk
